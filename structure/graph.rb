@@ -16,7 +16,8 @@ class Graph
 
     @neighbors_hash = set_neighbors
     @adj_matrix = gr.adj_matrix
-    @edges_hash = gr.edges_hash
+    @edges_hash = {}
+    set_edges_hash(@edges_hash)
   end
 
   def add_node(node)
@@ -50,6 +51,13 @@ class Graph
       n_hash[node] = find_neighbors(node)
     end
     n_hash
+  end
+
+  def set_edges_hash(e_hash)
+    @edges.each do |e|
+      e_hash[[e.src, e.dst]] = e
+      e_hash[[e.dst, e.src]] = e
+    end
   end
 
   def find_neighbors(node)
