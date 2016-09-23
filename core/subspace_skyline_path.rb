@@ -68,11 +68,11 @@ class SubspaceSkylinePath < SkylinePath
     raise ArgumentError, 'set the type please' if type.nil?
     case type
     when 'subspace'
-      edges.each { |edge| edge.set_subspace(postions) }
+      @edges.each { |edge| edge.set_subspace(postions) }
     when 'max'
-      edges.each { |edge| edge.set_max_attrs(postions) }
+      @edges.each { |edge| edge.set_max_attrs(postions) }
     when 'min'
-      edges.each { |edge| edge.set_min_attrs(postions) }
+      @edges.each { |edge| edge.set_min_attrs(postions) }
     end
   end
 end

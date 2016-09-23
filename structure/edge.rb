@@ -1,13 +1,13 @@
 # Record Edge
 class Edge
-  attr_reader :id, :src, :dst, :attrs, :norm_attrs, :max_attrs, :min_attrs
+  attr_accessor :id, :src, :dst, :attrs, :norm_attrs, :max_attrs, :min_attrs
 
-  def initialize(attrs, dim_times_array = nil)
-    @id                 = attrs.shift.to_i
-    @src                = attrs.shift.to_i
-    @dst                = attrs.shift.to_i
-    @attrs              = set_attrs_times(attrs, dim_times_array)
-    @norm_attrs         = @attrs.clone
+  def initialize
+    @id                 = []
+    @src                = []
+    @dst                = []
+    @attrs              = []
+    @norm_attrs         = []
     @max_attrs          = []
     @min_attrs          = []
     @max_attrs_postions = []

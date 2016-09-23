@@ -1,32 +1,43 @@
-require_relative 'util/read_util'
+require 'graph-reader'
+
 require_relative 'edge'
 
 # Normal Graph class
 class Graph
-  include ReadUtil
-
   attr_accessor :edges, :nodes
 
   def initialize(params = {})
-    raw_nodes = params[:raw_nodes]
-    raw_edges = params[:raw_edges]
-    @nodes = []
+    gr = GraphReader::Graph.new(params[:edges_filepath])
+    @nodes = gr.nodes
     @edges = []
-    initialize_nodes(raw_nodes)                           unless raw_nodes.nil?
-    initialize_edges(raw_edges, params[:dim_times_array]) unless raw_edges.nil?
+    adding_edges(gr.edges)
+    
     @dim = @edges.first.attrs.size unless @edges.empty?
 
     @neighbors_hash = set_neighbors
-    @edges_hash     = set_edges_hash
+    @adj_matrix = gr.adj_matrix
+    @edges_hash = gr.edges_hash
   end
 
   def add_node(node)
     @nodes << node unless @nodes.include?(node)
   end
 
-  def add_edge(edge, dim_times_array)
-    new_edge = edge.class == Edge ? edge : Edge.new(edge, dim_times_array)
-    @edges << new_edge unless duplicate_edge?(new_edge)
+  def adding_edges(edges)
+    edges.each do |e|
+      add_edge(e)
+    end
+  end
+
+  def add_edge(read_edge)
+    new_edge = Edge.new
+
+    new_edge.id    = read_edge.id
+    new_edge.src   = read_edge.src
+    new_edge.dst   = read_edge.dst
+    new_edge.attrs = read_edge.attrs
+
+    @edges << new_edge
   end
 
   def find_neighbors_at(node)
@@ -39,15 +50,6 @@ class Graph
       n_hash[node] = find_neighbors(node)
     end
     n_hash
-  end
-
-  def set_edges_hash
-    e_hash = {}
-    @edges.each do |edge|
-      e_hash[[edge.src, edge.dst]] = edge
-      e_hash[[edge.dst, edge.src]] = edge
-    end
-    e_hash
   end
 
   def find_neighbors(node)
@@ -65,13 +67,6 @@ class Graph
     when edge.dst
       return edge.src
     end
-  end
-
-  def duplicate_edge?(new_edge)
-    @edges.each do |edge|
-      return true if same_edge?(edge, new_edge)
-    end
-    false
   end
 
   def find_edge(src, dst)
