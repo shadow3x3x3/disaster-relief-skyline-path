@@ -47,6 +47,7 @@ class RefGraph < Graph
 
   def set_ref_path(src, dst, path)
     @ref_paths[[src, dst]] = path
+    @ref_paths[[dst, src]] = path.reverse
   end
 end
 
