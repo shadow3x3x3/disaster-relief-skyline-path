@@ -1,4 +1,5 @@
 require_relative '../lib/dijkstra'
+require 'json'
 
 class RefGraph < Graph
   include Dijkstra
@@ -16,6 +17,12 @@ class RefGraph < Graph
     find_all_ref_path
   end
 
+  def record_2_json
+    File.open("ref-path-data/top_300.json","w") do |f|
+      f.write(JSON.pretty_generate(@ref_paths))
+    end
+  end
+
   private
 
   def find_ref_edges(edges, ref_nums)
@@ -24,7 +31,6 @@ class RefGraph < Graph
 
   def find_all_ref_path
     @nodes.each do |n|
-      puts n
       @ref_edges.each do |re|
         query_ref_path(n, re.src) unless n == re.src
         query_ref_path(n, re.dst) unless n == re.dst
@@ -33,8 +39,10 @@ class RefGraph < Graph
   end
 
   def query_ref_path(src, dst)
-    temp_ref_path = shorest_path_query(src, dst)
-    set_ref_path(src, dst, temp_ref_path) unless temp_ref_path == nil
+    if @ref_paths[[src, dst]].nil?
+      temp_ref_path = shorest_path_query(src, dst) 
+      set_ref_path(src, dst, temp_ref_path) unless temp_ref_path == nil
+    end
   end
 
   def set_ref_path(src, dst, path)
