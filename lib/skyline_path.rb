@@ -19,7 +19,7 @@ class SkylinePath < Graph
     @part_skyline_path = {}
   end
 
-  def query_skyline_path(src_id: nil, dst_id: nil, limit: nil, evaluate: false)
+  def query_skyline_path(src_id: nil, dst_id: nil, limit: 1.3, evaluate: false)
     @distance_limit = limit
     @skyline_path      = {}
     @part_skyline_path = {}
