@@ -4,7 +4,7 @@ require_relative 'edge'
 
 # Normal Graph class
 class Graph
-  attr_accessor :edges, :nodes
+  attr_accessor :edges, :nodes, :adj_matrix, :neighbors_hash, :edges_hash
 
   def initialize(params = {})
     gr = GraphReader::Graph.new(params[:edges_filepath])
