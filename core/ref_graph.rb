@@ -17,12 +17,6 @@ class RefGraph < Graph
     find_all_ref_path
   end
 
-  def record_2_json
-    File.open("ref-path-data/top_300.json","w") do |f|
-      f.write(JSON.pretty_generate(@ref_paths))
-    end
-  end
-
   private
 
   def find_ref_edges(edges, ref_nums)
@@ -30,11 +24,18 @@ class RefGraph < Graph
   end
 
   def find_all_ref_path
-    @nodes.each do |n|
-      @ref_edges.each do |re|
+    @ref_edges.each_with_index do |re, i|
+      @nodes.each do |n|
         query_ref_path(n, re.src) unless n == re.src
         query_ref_path(n, re.dst) unless n == re.dst
       end
+      record_2_json("ref-path-data/top_#{i + 1}.json") if (i + 1) % 5 == 0
+    end
+  end
+
+  def record_2_json(file_name)
+    File.open(file_name, "w") do |f|
+      f.write(JSON.pretty_generate(@ref_paths))
     end
   end
 
