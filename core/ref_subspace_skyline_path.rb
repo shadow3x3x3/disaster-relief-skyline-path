@@ -7,12 +7,13 @@ class RefSubspaceSkylinePath < SubspaceSkylinePath
  
   def initialize(params = {})
     super
-    read_ref_paths
   end
 
   def read_ref_paths
     file = File.read("ref-path-data/top_5.json")
-    @ref_paths = JSON.parse(file).map { |k , v| {JSON.parse(k) => v} }
+    @ref_paths = JSON.parse(file).map do |k , v| 
+      { JSON.parse(k) => attrs_in(v)} 
+    end
   end
 
 end
