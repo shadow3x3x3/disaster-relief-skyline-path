@@ -13,39 +13,25 @@ require_relative 'dijkstra'
 class SkylinePath < Graph
   include Dijkstra
 
+  attr_reader :shorest_distance
+
   def initialize(params = {})
     super
     @skyline_path      = {}
     @part_skyline_path = {}
   end
 
-  def query_skyline_path(src_id: nil, dst_id: nil, limit: 1.3, evaluate: false)
+  def query_skyline_path(src_id: nil, dst_id: nil, limit: 1.3)
     @distance_limit = limit
     @skyline_path      = {}
     @part_skyline_path = {}
     query_check(src_id, dst_id)
-    if evaluate
-      Benchmark.benchmark(CAPTION, 22, FORMAT, 'total:') do |step|
-        t1 = step.report('Shorest path') do
-          shorest_path = shorest_path_query(src_id, dst_id)
-          raise "Can't find any road between #{src_id} and #{dst_id}" if shorest_path.nil?
-          @skyline_path[path_to_sym(shorest_path)] = attrs_in(shorest_path)
-          @shorest_distance = @skyline_path[path_to_sym(shorest_path)].first
-          @limit_dis = @shorest_distance * @distance_limit
-        end
-        t2 = step.report('SkyPath') do
-          sky_path(src_id, dst_id)
-        end
-        [t1 + t2]
-      end
-    else
-      shorest_path = shorest_path_query(src_id, dst_id)
-      raise "Can't find any road between #{src_id} and #{dst_id}" if shorest_path.nil?
-      @skyline_path[path_to_sym(shorest_path)] = attrs_in(shorest_path)
-      @shorest_distance = @skyline_path[path_to_sym(shorest_path)].first
-      @limit_dis = @shorest_distance * @distance_limit
-      sky_path(src_id, dst_id)
-    end
+    shorest_path = shorest_path_query(src_id, dst_id)
+    raise "Can't find any road between #{src_id} and #{dst_id}" if shorest_path.nil?
+    @skyline_path[path_to_sym(shorest_path)] = attrs_in(shorest_path)
+    @shorest_distance = @skyline_path[path_to_sym(shorest_path)].first
+    @limit_dis = @shorest_distance * @distance_limit
+    sky_path(src_id, dst_id)
 
     # puts "Found #{@skyline_path.size} Skyline paths"
     
@@ -130,8 +116,6 @@ class SkylinePath < Graph
     @skyline_path[path_to_sym(pass)] = attrs if new_skyline_flag
   end
 
-  private
-
   def next_hop?(n, pass, next_path_attrs)
     unless @distance_limit.nil?
       return false if out_of_limit?(next_path_attrs.first)
@@ -143,6 +127,9 @@ class SkylinePath < Graph
     return false if full_dominance?(next_path_attrs)
     true
   end
+
+  private
+
 
   def out_of_limit?(distance)
     distance > @limit_dis ? true : false
