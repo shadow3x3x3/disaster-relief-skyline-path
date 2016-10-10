@@ -127,8 +127,7 @@ class SkylinePath < Graph
       return false if out_of_limit?(next_path_attrs.first)
     end
     return false if pass.include?(n)
-    partial_result = partial_dominance?(n, next_path_attrs)
-    return false if partial_result
+    return false if partial_dominance?(n, next_path_attrs)
     add_part_skyline(n, next_path_attrs)
     return false if full_dominance?(next_path_attrs)
     true
