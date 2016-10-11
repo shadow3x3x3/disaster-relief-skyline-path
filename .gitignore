@@ -52,7 +52,7 @@ build-iPhoneSimulator/
 .vscode
 
 # Salu IMP Data
-salu-data/
+data/
 output/
 /full_testing.rb
 ref-path-data/
