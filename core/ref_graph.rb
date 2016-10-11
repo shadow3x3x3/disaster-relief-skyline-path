@@ -1,8 +1,9 @@
 require_relative '../lib/dijkstra'
+require_relative 'subspace_skyline_path'
 require 'json'
 
 class RefGraph < Graph
-  include Dijkstra
+  include Dijkstra 
 
   attr_reader :ref_edges, :ref_paths
 
@@ -26,10 +27,11 @@ class RefGraph < Graph
   def find_all_ref_path
     @ref_edges.each_with_index do |re, i|
       @nodes.each do |n|
-        query_ref_path(n, re.src) unless n == re.src
-        query_ref_path(n, re.dst) unless n == re.dst
+        query_ref_path(n, re.src) if n != re.src && @ref_paths[[n, re.src]].nil?
+        query_ref_path(n, re.dst) if n != re.dst && @ref_paths[[n, re.dst]].nil?
+        puts n
       end
-      record_2_json("ref-path-data/top_#{i + 1}.json") if (i + 1) % 5 == 0
+      record_2_json("../ref-path-data/top_#{i + 1}.json") if (i + 1) % 5 == 0
     end
   end
 
@@ -40,10 +42,8 @@ class RefGraph < Graph
   end
 
   def query_ref_path(src, dst)
-    if @ref_paths[[src, dst]].nil?
-      temp_ref_path = shorest_path_query(src, dst) 
-      set_ref_path(src, dst, temp_ref_path) unless temp_ref_path == nil
-    end
+    temp_ref_path = shorest_path_query(src, dst) 
+    set_ref_path(src, dst, temp_ref_path) unless temp_ref_path == nil
   end
 
   def set_ref_path(src, dst, path)
@@ -51,5 +51,4 @@ class RefGraph < Graph
     @ref_paths[[dst, src]] = path.reverse
   end
 end
-
 
