@@ -45,7 +45,7 @@ class SubspaceSkylinePath < SkylinePath
 
   def sky_path(cur, dst, pass = [], cur_attrs = Array.new(@dim, 0))
     pass << cur
-    if cur == dst
+    if cur == dst || @skyline_path.size >= @stop_num
       pass = arrived(cur, pass, cur_attrs)
       return
     end
@@ -54,6 +54,14 @@ class SubspaceSkylinePath < SkylinePath
       sky_path(n, dst, pass, next_path_attrs) if next_hop?(n, pass, next_path_attrs)
     end
     pass.delete(cur)
+  end
+
+  def next_hop?(n, pass, next_path_attrs)
+    return false if pass.include?(n)
+    return false if partial_dominance?(n, next_path_attrs)
+    add_part_skyline(n, next_path_attrs)
+    return false if full_dominance?(next_path_attrs)
+    true
   end
 
   def combine_aggregate(attrs, target_edge)

@@ -21,27 +21,18 @@ class SkylinePath < Graph
     @part_skyline_path = {}
   end
 
-  def query_skyline_path(src_id: nil, dst_id: nil, limit: 1.3)
-    @distance_limit = limit
+  def query_skyline_path(src_id: nil, dst_id: nil, stop_num: 10000)
+    @stop_num       = stop_num
     @skyline_path      = {}
     @part_skyline_path = {}
     query_check(src_id, dst_id)
     shorest_path = shorest_path_query(src_id, dst_id)
     raise "Can't find any road between #{src_id} and #{dst_id}" if shorest_path.nil?
     @skyline_path[path_to_sym(shorest_path)] = attrs_in(shorest_path)
-    @shorest_distance = @skyline_path[path_to_sym(shorest_path)].first
-    puts shorest_distance
-    @limit_dis = @shorest_distance * @distance_limit
+    puts @skyline_path[path_to_sym(shorest_path)].first
     puts Benchmark.measure { sky_path(src_id, dst_id) }
-    # puts "Found #{@skyline_path.size} Skyline paths"
     
-    @skyline_path
-  end
-
-  def get_all_paths(params)
-    src = params[:src_id]
-    dst = params[:dst_id]
-    find_paths(src, dst)
+    @skyline_path.size
   end
 
   def find_paths(src, dst)
@@ -117,9 +108,6 @@ class SkylinePath < Graph
   end
 
   def next_hop?(n, pass, next_path_attrs)
-    unless @distance_limit.nil?
-      return false if out_of_limit?(next_path_attrs.first)
-    end
     return false if pass.include?(n)
     return false if partial_dominance?(n, next_path_attrs)
     add_part_skyline(n, next_path_attrs)
@@ -128,11 +116,6 @@ class SkylinePath < Graph
   end
 
   private
-
-
-  def out_of_limit?(distance)
-    distance > @limit_dis ? true : false
-  end
 
   def partial_dominance?(target, path_attrs)
     unless @part_skyline_path[target].nil?

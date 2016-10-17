@@ -10,7 +10,7 @@ class RefSubspaceSkylinePath < SubspaceSkylinePath
   end
 
   def read_ref_paths
-    file = File.read("ref-path-data/top_5.json")
+    file = File.read("ref-path-data/go_top_5.json")
     @ref_paths = JSON.parse(file).map do |k , v| 
       { JSON.parse(k) => attrs_in(v) } 
     end
@@ -21,14 +21,11 @@ class RefSubspaceSkylinePath < SubspaceSkylinePath
   end
 
   def next_hop?(n, pass, next_path_attrs)
-    unless @distance_limit.nil?
-      return false if out_of_limit?(next_path_attrs.first)
-    end
     return false if pass.include?(n)
     return false if partial_dominance?(n, next_path_attrs)
     add_part_skyline(n, next_path_attrs)
-    return false if reference_dominance?([pass.first, n], next_path_attrs)
     return false if full_dominance?(next_path_attrs)
+    return false if reference_dominance?([pass.first, n], next_path_attrs)    
     true
   end
 
